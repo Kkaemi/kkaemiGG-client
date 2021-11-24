@@ -1,5 +1,11 @@
+import path from "path";
+
 module.exports = {
-  transpileDependencies: [
-    'vuetify'
-  ]
-}
+  transpileDependencies: ["vuetify"],
+
+  configureWebpack: {
+    resolve: {
+      alias: { "@": path.join(__dirname, "src/") },
+    },
+  },
+};
