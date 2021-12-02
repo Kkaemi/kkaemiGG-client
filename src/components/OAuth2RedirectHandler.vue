@@ -3,6 +3,10 @@
 </template>
 
 <script>
+import { createNamespacedHelpers } from "vuex";
+
+const { mapMutations } = createNamespacedHelpers("auth");
+
 export default {
   name: "OAuth2RedirectHandler",
 
@@ -11,7 +15,7 @@ export default {
     const error = this.$route.query.error;
 
     if (accessToken) {
-      localStorage.setItem("kkaemigg_access_token", accessToken);
+      this.setToken(accessToken);
     }
 
     if (error) {
@@ -20,6 +24,10 @@ export default {
     }
 
     this.$router.replace("/");
+  },
+
+  methods: {
+    ...mapMutations(["setToken"]),
   },
 };
 </script>

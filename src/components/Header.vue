@@ -13,20 +13,24 @@
 
     <v-spacer></v-spacer>
 
-    <v-dialog v-if="!authenticated" v-model="dialog" width="500">
+    <v-dialog v-if="!isAuthenticated" v-model="dialog" width="500">
       <template v-slot:activator="{ on, attrs }">
         <v-btn text v-bind="attrs" v-on="on"> 로그인 </v-btn>
       </template>
 
       <v-card class="pt-5">
-        <v-card-text class="d-flex align-center">
+        <v-card-text
+          class="d-flex align-center"
+          v-for="(social, index) in socials"
+          :key="index"
+        >
           <v-btn
-            color="primary"
+            :color="social.buttonColor"
             block
-            href="http://localhost:8080/oauth2/authorize/google?redirect_uri=http://localhost:3000/oauth2/redirect"
+            :href="getSocialLoginUrl(social.type)"
           >
-            <v-icon>mdi-google</v-icon>
-            <span class="ml-3">구글로 로그인</span>
+            <v-icon>{{ social.icon }}</v-icon>
+            <span class="ml-3">{{ social.comment }}</span>
           </v-btn>
         </v-card-text>
 
@@ -43,31 +47,37 @@
 </template>
 
 <script>
-import axios from "axios";
+import { createNamespacedHelpers } from "vuex";
+import { API_BASE_URL, REDIRECT_URI } from "@/constant";
+
+const { mapActions, mapGetters } = createNamespacedHelpers("auth");
 
 export default {
   name: "Header",
 
   data: () => ({
     dialog: false,
+    socials: [
+      {
+        type: "google",
+        buttonColor: "primary",
+        icon: "mdi-google",
+        comment: "구글로 로그인",
+      },
+    ],
   }),
 
   computed: {
-    authenticated() {
-      return localStorage.getItem("kkaemigg_access_token") !== null;
+    ...mapGetters(["token"]),
+    isAuthenticated() {
+      return this.token !== null;
     },
   },
 
   methods: {
-    logout: async () => {
-      try {
-        await axios.delete("http://localhost:8080/api/v1/token", {
-          withCredentials: true,
-        });
-        localStorage.removeItem("kkaemigg_access_token");
-      } catch (error) {
-        alert("로그아웃 실패");
-      }
+    ...mapActions(["logout"]),
+    getSocialLoginUrl(socialType) {
+      return `${API_BASE_URL}/oauth2/authorize/${socialType}?redirect_uri=${REDIRECT_URI}`;
     },
   },
 };
