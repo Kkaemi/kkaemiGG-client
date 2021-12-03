@@ -1,5 +1,5 @@
 import router from "@/router";
-import { kkaemiGGApi } from "../../api/client";
+import { kkaemiGGApi } from "@/api/kkaemigg";
 
 export const auth = {
   namespaced: true,
