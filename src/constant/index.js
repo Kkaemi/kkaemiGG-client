@@ -5,3 +5,6 @@ export const API_BASE_URL = `${location.protocol}//${location.hostname}${BACKEND
 // client redirect uri
 const FRONTEND_PORT = `:${process.env.VUE_APP_FRONTEND_PORT}`;
 export const REDIRECT_URI = `${location.protocol}//${location.hostname}${FRONTEND_PORT}/oauth2/redirect`;
+
+// riot api key
+export const RIOT_API_KEY = process.env.VUE_APP_RIOT_API_KEY;

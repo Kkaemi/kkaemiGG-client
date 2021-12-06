@@ -41,6 +41,11 @@ export default {
 
   methods: {
     submit() {
+      if (/[`~!@#$%^&*|\\'\\";:\\/?]/gi.test(this.userName)) {
+        alert("특수문자는 입력할 수 없습니다.");
+        return;
+      }
+
       this.$router.push({
         name: "summoner",
         params: { userName: this.userName },

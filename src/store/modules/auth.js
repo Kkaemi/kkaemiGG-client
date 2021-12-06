@@ -1,7 +1,7 @@
 import router from "@/router";
 import { kkaemiGGApi } from "@/api/kkaemigg";
 
-export const auth = {
+export default {
   namespaced: true,
 
   state: {

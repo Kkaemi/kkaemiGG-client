@@ -1,14 +1,19 @@
 <template>
   <v-container>
-    <div>
-      {{ $route.params.userName }}
-    </div>
+    <Profile />
+    <v-divider class="my-5" />
   </v-container>
 </template>
 
 <script>
+import Profile from "./Profile.vue";
+
 export default {
   name: "Summoner",
+
+  components: {
+    Profile,
+  },
 };
 </script>
 
