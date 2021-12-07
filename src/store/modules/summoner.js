@@ -1,5 +1,6 @@
 import { kkaemiGGApi } from "@/api/kkaemigg";
 import profile from "./summoner/profile";
+import leaguePositions from "./summoner/league-positions";
 
 export default {
   namespaced: true,
@@ -31,5 +32,6 @@ export default {
 
   modules: {
     profile,
+    leaguePositions,
   },
 };
