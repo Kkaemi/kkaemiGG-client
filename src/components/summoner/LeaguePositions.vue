@@ -1,21 +1,16 @@
 <template>
-  <v-row>
-    <v-col cols="12" class="d-flex">
-      <div>
-        <league-positions-template
-          :rankInfo="soloRankInfo"
-          rankType="솔로랭크"
-        />
+  <v-col class="d-flex">
+    <div>
+      <league-positions-template :rankInfo="soloRankInfo" rankType="솔로랭크" />
 
-        <div class="my-3"></div>
+      <div class="my-3"></div>
 
-        <league-positions-template
-          :rankInfo="freeRankInfo"
-          rankType="자유 5:5 랭크"
-        />
-      </div>
-    </v-col>
-  </v-row>
+      <league-positions-template
+        :rankInfo="freeRankInfo"
+        rankType="자유 5:5 랭크"
+      />
+    </div>
+  </v-col>
 </template>
 
 <script>

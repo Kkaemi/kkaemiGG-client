@@ -25,5 +25,10 @@ export default {
       state.soloRankInfo = soloRank;
       state.freeRankInfo = freeRank;
     },
+
+    initLeaguePositionsModuleState(state) {
+      state.soloRankInfo = null;
+      state.freeRankInfo = null;
+    },
   },
 };

@@ -26,5 +26,11 @@ export default {
       state.name = name;
       state.profileIconImageUrl = profileIconImageUrl;
     },
+
+    initProfileModuleState(state) {
+      state.level = 0;
+      state.name = "";
+      state.profileIconImageUrl = "";
+    },
   },
 };

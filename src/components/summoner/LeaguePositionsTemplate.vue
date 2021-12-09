@@ -2,7 +2,7 @@
   <v-sheet v-if="!rankInfo" outlined class="d-flex pa-5 align-center">
     <v-img
       src="@/assets/ranked-emblems/Emblem_Unranked.png"
-      max-width="100"
+      max-width="70"
       contain
     ></v-img>
     <div class="ml-6">
@@ -14,7 +14,7 @@
     <v-img
       :src="require(`@/assets/ranked-emblems/Emblem_${rankInfo.tier}.png`)"
       contain
-      max-width="100"
+      max-width="70"
     ></v-img>
 
     <div class="ml-6">

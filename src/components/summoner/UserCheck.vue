@@ -9,8 +9,12 @@ import { createNamespacedHelpers } from "vuex";
 import NotExists from "./NotExists.vue";
 import Summoner from "./Summoner.vue";
 
-const { mapState, mapMutations, mapActions } =
-  createNamespacedHelpers("summoner");
+const summonerMappers = createNamespacedHelpers("summoner");
+const profileMappers = createNamespacedHelpers("summoner/profile");
+const leaguePostionsMappers = createNamespacedHelpers(
+  "summoner/leaguePositions"
+);
+const matchListMappers = createNamespacedHelpers("summoner/matchList");
 
 export default {
   async created() {
@@ -21,7 +25,7 @@ export default {
   },
 
   computed: {
-    ...mapState(["isExists"]),
+    ...summonerMappers.mapState(["isExists"]),
   },
 
   data: () => ({
@@ -29,8 +33,39 @@ export default {
   }),
 
   methods: {
-    ...mapMutations(["setUserName"]),
-    ...mapActions(["checkUserName"]),
+    ...summonerMappers.mapMutations(["setUserName"]),
+    ...matchListMappers.mapMutations(["setBeginIndex"]),
+    ...profileMappers.mapMutations(["initProfileModuleState"]),
+    ...leaguePostionsMappers.mapMutations(["initLeaguePositionsModuleState"]),
+    ...matchListMappers.mapMutations(["initMatchListModuleState"]),
+
+    ...summonerMappers.mapActions(["checkUserName"]),
+    ...profileMappers.mapActions(["fetchProfile"]),
+    ...leaguePostionsMappers.mapActions(["fetchLeaguePositions"]),
+    ...matchListMappers.mapActions(["fetchMatchList"]),
+  },
+
+  async beforeRouteUpdate(to, from, next) {
+    this.setUserName(to.params.userName);
+    await this.checkUserName();
+
+    if (!this.isExists) {
+      this.component = NotExists;
+      next();
+      return;
+    }
+
+    this.initProfileModuleState();
+    await this.fetchProfile();
+
+    this.initLeaguePositionsModuleState();
+    await this.fetchLeaguePositions();
+
+    this.initMatchListModuleState();
+    await this.fetchMatchList();
+
+    this.component = Summoner;
+    next();
   },
 };
 </script>
