@@ -21,10 +21,6 @@ const { mapActions, mapState } = createNamespacedHelpers("summoner/profile");
 export default {
   name: "Profile",
 
-  async mounted() {
-    await this.fetchProfile();
-  },
-
   computed: {
     ...mapState(["level", "name", "profileIconImageUrl"]),
   },

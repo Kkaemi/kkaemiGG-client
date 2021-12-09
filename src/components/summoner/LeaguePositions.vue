@@ -26,10 +26,6 @@ export default {
 
   name: "LeaguePositions",
 
-  async mounted() {
-    await this.fetchLeaguePositions();
-  },
-
   computed: {
     ...mapState(["soloRankInfo", "freeRankInfo"]),
     ...mapGetters(["getSoloRankTierImage", "getFreeRankTierImage"]),

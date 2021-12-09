@@ -9,19 +9,33 @@ import { createNamespacedHelpers } from "vuex";
 import NotExists from "./NotExists.vue";
 import Summoner from "./Summoner.vue";
 
+const loadingMappers = createNamespacedHelpers("loading");
 const summonerMappers = createNamespacedHelpers("summoner");
 const profileMappers = createNamespacedHelpers("summoner/profile");
+const matchListMappers = createNamespacedHelpers("summoner/matchList");
 const leaguePostionsMappers = createNamespacedHelpers(
   "summoner/leaguePositions"
 );
-const matchListMappers = createNamespacedHelpers("summoner/matchList");
 
 export default {
   async created() {
     this.setUserName(this.$route.params.userName);
     await this.checkUserName();
 
-    this.component = this.isExists ? Summoner : NotExists;
+    if (!this.isExists) {
+      this.component = NotExists;
+      return;
+    }
+
+    this.setIsLoading(true);
+
+    await this.fetchProfile();
+    await this.fetchLeaguePositions();
+    await this.fetchMatchList();
+
+    this.setIsLoading(false);
+
+    this.component = Summoner;
   },
 
   computed: {
@@ -33,6 +47,8 @@ export default {
   }),
 
   methods: {
+    ...loadingMappers.mapMutations(["setIsLoading"]),
+
     ...summonerMappers.mapMutations(["setUserName"]),
     ...matchListMappers.mapMutations(["setBeginIndex"]),
     ...profileMappers.mapMutations(["initProfileModuleState"]),
@@ -55,6 +71,8 @@ export default {
       return;
     }
 
+    this.setIsLoading(true);
+
     this.initProfileModuleState();
     await this.fetchProfile();
 
@@ -63,6 +81,8 @@ export default {
 
     this.initMatchListModuleState();
     await this.fetchMatchList();
+
+    this.setIsLoading(false);
 
     this.component = Summoner;
     next();

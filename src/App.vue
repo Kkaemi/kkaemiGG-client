@@ -3,6 +3,7 @@
     <Header />
     <v-main>
       <router-view></router-view>
+      <Spinner />
       <Footer />
     </v-main>
   </v-app>
@@ -11,6 +12,7 @@
 <script>
 import Header from "./components/Header.vue";
 import Footer from "@/components/Footer.vue";
+import Spinner from "./components/Spinner.vue";
 
 export default {
   name: "App",
@@ -18,10 +20,7 @@ export default {
   components: {
     Header,
     Footer,
+    Spinner,
   },
-
-  data: () => ({
-    //
-  }),
 };
 </script>

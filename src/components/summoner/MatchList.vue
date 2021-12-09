@@ -314,11 +314,6 @@ const { mapState, mapActions, mapMutations, mapGetters } =
 export default {
   name: "MatchList",
 
-  async mounted() {
-    this.setMatchList([]);
-    await this.fetchMatchList();
-  },
-
   computed: {
     ...mapState(["matchList"]),
     ...mapGetters(["getUserName"]),
