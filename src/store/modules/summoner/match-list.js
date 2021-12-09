@@ -6,6 +6,7 @@ export default {
   state: {
     matchList: [],
     beginIndex: 0,
+    isMore: true,
   },
 
   getters: {
@@ -24,7 +25,17 @@ export default {
         { params: { beginIndex } }
       );
 
-      commit("setMatchList", data.data);
+      const matchList = data.data;
+
+      if (matchList.length < 20) {
+        commit("setIsMore", false);
+      }
+
+      if (beginIndex === 0) {
+        commit("setMatchList", matchList);
+      } else {
+        commit("setMatchList", [...state.matchList, ...matchList]);
+      }
     },
   },
 
@@ -40,6 +51,7 @@ export default {
     initMatchListModuleState(state) {
       state.matchList = [];
       state.beginIndex = 0;
+      state.isMore = true;
     },
   },
 };

@@ -301,6 +301,20 @@
         </div>
       </div>
     </v-sheet>
+
+    <div>
+      <v-btn
+        v-show="isMore"
+        large
+        class="rounded-0"
+        outlined
+        block
+        elevation="0"
+        :loading="moreFetchLoading"
+        @click.stop="moreFetch"
+        >더 보기</v-btn
+      >
+    </div>
   </v-col>
 </template>
 
@@ -315,13 +329,26 @@ export default {
   name: "MatchList",
 
   computed: {
-    ...mapState(["matchList"]),
+    ...mapState(["matchList", "beginIndex", "isMore"]),
     ...mapGetters(["getUserName"]),
   },
 
+  data: () => ({
+    moreFetchLoading: false,
+  }),
+
   methods: {
     ...mapActions(["fetchMatchList"]),
-    ...mapMutations(["setMatchList"]),
+    ...mapMutations(["setMatchList", "setBeginIndex"]),
+
+    async moreFetch() {
+      this.moreFetchLoading = true;
+
+      this.setBeginIndex(this.beginIndex + 20);
+      await this.fetchMatchList();
+
+      this.moreFetchLoading = false;
+    },
 
     toLocaleString(UTCDateTime) {
       return DateTime.fromISO(UTCDateTime).toLocaleString(
