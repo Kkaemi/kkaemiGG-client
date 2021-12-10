@@ -29,6 +29,8 @@ export default {
 
       if (matchList.length < 20) {
         commit("setIsMore", false);
+      } else {
+        commit("setIsMore", true);
       }
 
       if (beginIndex === 0) {
@@ -46,6 +48,10 @@ export default {
 
     setBeginIndex(state, beginIndex) {
       state.beginIndex = beginIndex;
+    },
+
+    setIsMore(state, isMore) {
+      state.isMore = isMore;
     },
 
     initMatchListModuleState(state) {

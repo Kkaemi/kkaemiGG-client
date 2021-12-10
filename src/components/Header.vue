@@ -11,6 +11,10 @@
       </div>
     </router-link>
 
+    <v-btn elevation="0" class="ml-5" plain :to="{ name: 'postSearch' }">
+      커뮤니티
+    </v-btn>
+
     <v-spacer></v-spacer>
 
     <v-dialog v-if="!isAuthenticated" v-model="dialog" width="500">

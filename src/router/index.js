@@ -2,6 +2,7 @@ import VueRouter from "vue-router";
 import Home from "@/components/Home.vue";
 import OAuth2RedirectHandler from "@/components/OAuth2RedirectHandler.vue";
 import UserCheck from "@/components/summoner/UserCheck.vue";
+import Community from "@/components/community/Community.vue";
 
 export default new VueRouter({
   mode: "history",
@@ -18,7 +19,9 @@ export default new VueRouter({
       component: UserCheck,
     },
     {
-      path: "/community",
+      path: "/community/posts/all",
+      name: "postSearch",
+      component: Community,
     },
     {
       path: "/oauth2/redirect",

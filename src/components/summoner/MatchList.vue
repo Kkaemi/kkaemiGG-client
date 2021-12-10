@@ -140,15 +140,7 @@
       </div>
 
       <div
-        class="
-          d-flex
-          flex-column
-          align-center
-          justify-center
-          text-body-2
-          grey--text
-          text--darken-2
-        "
+        class="d-flex flex-column align-center justify-center text-body-2 grey--text text--darken-2"
       >
         <div>레벨{{ match.championInfo.championLevel }}</div>
         <div>
@@ -222,7 +214,15 @@
           >
             <template v-slot:activator="{ attr, on }">
               <div class="d-flex mb-1 align-center">
+                <div
+                  v-if="!participantInfo.championImageUrl"
+                  v-bind="attr"
+                  v-on="on"
+                  class="grey lighten-1 mr-1"
+                  style="width: 20px; height: 20px"
+                ></div>
                 <v-img
+                  v-else
                   v-bind="attr"
                   v-on.stop="on"
                   :src="participantInfo.championImageUrl"
@@ -267,7 +267,15 @@
           >
             <template v-slot:activator="{ attr, on }">
               <div class="d-flex mb-1 align-center">
+                <div
+                  v-if="!participantInfo.championImageUrl"
+                  v-bind="attr"
+                  v-on="on"
+                  class="grey lighten-1 mr-1"
+                  style="width: 20px; height: 20px"
+                ></div>
                 <v-img
+                  v-else
                   v-bind="attr"
                   v-on.stop="on"
                   :src="participantInfo.championImageUrl"

@@ -1,7 +1,7 @@
 import { kkaemiGGApi } from "@/api/kkaemigg";
-import profile from "./summoner/profile";
-import leaguePositions from "./summoner/league-positions";
-import matchList from "./summoner/match-list";
+import profile from "./profile";
+import leaguePositions from "./league-positions";
+import matchList from "./match-list";
 
 export default {
   namespaced: true,
