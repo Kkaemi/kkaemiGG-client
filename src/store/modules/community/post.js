@@ -1,19 +1,22 @@
 import { kkaemiGGApi } from "@/api/kkaemigg";
 import router from "@/router";
+import { toLocalDateTime } from "@/utils/date-utils";
 
 export default {
   namespaced: true,
 
   state: {
+    postId: 0,
+    userId: 0,
+    userNickname: "",
+    viewCount: 0,
     title: "",
     content: "",
+    createdDate: "",
   },
 
   getters: {
-    getRequestBody: ({ title, content }) => ({
-      title,
-      content,
-    }),
+    getCreatedDate: (state) => toLocalDateTime(state.createdDate),
   },
 
   actions: {
@@ -47,33 +50,40 @@ export default {
       return imageUrl;
     },
 
-    async writePost({ getters, rootGetters, dispatch, commit }) {
+    async writePost({ rootGetters, dispatch, commit }, payload) {
       commit("loading/setIsLoading", true, { root: true });
       await dispatch("auth/checkAuth", null, { root: true });
 
       const accessToken = rootGetters["auth/token"];
-      const requestBody = getters.getRequestBody;
-      const { data } = await kkaemiGGApi.post("/v1/posts", requestBody, {
+      const { data } = await kkaemiGGApi.post("/v1/posts", payload, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
 
       commit("loading/setIsLoading", false, { root: true });
-      commit("setTitle", "");
-      commit("setContent", "");
 
       router.push({ name: "postView", params: { postId: data } });
+    },
+
+    async fetchPost({ commit }, payload) {
+      const { data } = await kkaemiGGApi.get(`/v1/posts/${payload}`);
+      commit("setPostState", data);
     },
   },
 
   mutations: {
-    setTitle(state, title) {
+    setPostState(
+      state,
+      { postId, userId, userNickname, viewCount, title, content, createdDate }
+    ) {
+      state.postId = postId;
+      state.userId = userId;
+      state.userNickname = userNickname;
+      state.viewCount = viewCount;
       state.title = title;
-    },
-
-    setContent(state, content) {
       state.content = content;
+      state.createdDate = createdDate;
     },
   },
 };

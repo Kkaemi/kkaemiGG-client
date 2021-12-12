@@ -10,11 +10,12 @@ export default {
 
   getters: {
     token: (state) => state.token,
-    getAccessTokenExp: (state) => {
+
+    tokenPayloadGetter: (state) => {
       const accessToken = state.token;
 
       if (!accessToken) {
-        return 0;
+        return null;
       }
 
       const base64 = accessToken
@@ -24,7 +25,15 @@ export default {
       const jsonPayload = decodeURIComponent(
         Buffer.from(base64, "base64").toString("utf-8")
       );
-      return JSON.parse(jsonPayload).exp;
+      return JSON.parse(jsonPayload);
+    },
+
+    getAccessTokenExp: (state, getters) => {
+      return getters.tokenPayloadGetter?.exp || 0;
+    },
+
+    currentUserId: (state, getters) => {
+      return getters.tokenPayloadGetter?.sub;
     },
   },
 

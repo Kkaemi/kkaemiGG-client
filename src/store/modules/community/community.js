@@ -1,5 +1,5 @@
 import { kkaemiGGApi } from "@/api/kkaemigg";
-import { DateTime } from "luxon";
+import { calcPast } from "../../../utils/date-utils";
 import post from "./post";
 
 export default {
@@ -77,15 +77,9 @@ export default {
 
     setPostList(state, postList) {
       state.postList = postList.map((post) => {
-        const now = DateTime.now();
-        const createdDate = DateTime.fromISO(post.createdDate);
-
         return {
           ...post,
-          createdDate:
-            now.diff(createdDate, ["days"]).toObject().days > 1
-              ? createdDate.toLocaleString(DateTime.DATE_MED)
-              : createdDate.toLocaleString(DateTime.TIME_24_SIMPLE),
+          createdDate: calcPast(post.createdDate),
           title: `${post.title} ${post.comments ? `[${post.comments}]` : ""}`,
         };
       });

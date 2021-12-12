@@ -5,6 +5,7 @@ import OAuth2RedirectHandler from "@/components/OAuth2RedirectHandler.vue";
 import UserCheck from "@/components/summoner/UserCheck.vue";
 import Community from "@/components/community/Community.vue";
 import PostWrite from "@/components/community/PostWrite.vue";
+import PostView from "@/components/community/PostView.vue";
 import store from "@/store";
 
 Vue.use(VueRouter);
@@ -30,6 +31,11 @@ const routes = [
     name: "postWrite",
     component: PostWrite,
     meta: { requiresLogin: true },
+  },
+  {
+    path: "/community/posts/:postId",
+    name: "postView",
+    component: PostView,
   },
   {
     path: "/oauth2/redirect",

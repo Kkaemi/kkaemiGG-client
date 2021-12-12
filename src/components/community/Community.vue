@@ -171,8 +171,8 @@ export default {
       });
     },
 
-    clickRow() {
-      console.log("click");
+    clickRow({ postId }) {
+      this.$router.push({ name: "postView", params: { postId } });
     },
   },
 

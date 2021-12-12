@@ -4,8 +4,7 @@
       <v-col cols="12"> </v-col>
       <v-col cols="12">
         <v-text-field
-          :value="title"
-          @input="setTitle"
+          v-model="title"
           class="rounded-0"
           outlined
           hide-details
@@ -85,8 +84,7 @@ import "@toast-ui/editor/dist/toastui-editor.css";
 import { Editor } from "@toast-ui/vue-editor";
 import { createNamespacedHelpers } from "vuex";
 
-const { mapActions, mapMutations, mapState } =
-  createNamespacedHelpers("community/post");
+const { mapActions } = createNamespacedHelpers("community/post");
 
 export default {
   name: "PostWrite",
@@ -95,13 +93,12 @@ export default {
     Editor,
   },
 
-  computed: {
-    ...mapState(["title"]),
-  },
-
   data() {
     return {
       cancelDialog: false,
+
+      title: "",
+
       editorOptions: {
         minHeight: "200px",
         language: "ko-KR",
@@ -125,12 +122,12 @@ export default {
 
   methods: {
     ...mapActions(["uploadImage", "writePost"]),
-    ...mapMutations(["setTitle", "setContent"]),
 
     async submit() {
+      const title = this.title;
       const content = this.$refs.toastuiEditor.invoke("getHtml");
 
-      if (!this.title) {
+      if (!title) {
         alert("제목을 입력해 주세요.");
         return;
       }
@@ -140,8 +137,7 @@ export default {
         return;
       }
 
-      this.setContent(content);
-      await this.writePost();
+      await this.writePost({ title, content });
     },
   },
 };
