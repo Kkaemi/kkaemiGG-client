@@ -7,10 +7,13 @@
             <h2 class="ml-3">자유 게시판</h2>
             <v-spacer></v-spacer>
             <v-btn
+              small
+              icon
               plain
-              color="grey lighten-1"
               elevation="0"
+              color="grey lighten-1"
               class="justify-end pa-0"
+              :to="{ name: 'postWrite' }"
             >
               <v-icon>mdi-pencil</v-icon>
             </v-btn>

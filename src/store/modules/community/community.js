@@ -1,4 +1,6 @@
 import { kkaemiGGApi } from "@/api/kkaemigg";
+import { DateTime } from "luxon";
+import post from "./post";
 
 export default {
   namespaced: true,
@@ -74,11 +76,27 @@ export default {
     },
 
     setPostList(state, postList) {
-      state.postList = postList;
+      state.postList = postList.map((post) => {
+        const now = DateTime.now();
+        const createdDate = DateTime.fromISO(post.createdDate);
+
+        return {
+          ...post,
+          createdDate:
+            now.diff(createdDate, ["days"]).toObject().days > 1
+              ? createdDate.toLocaleString(DateTime.DATE_MED)
+              : createdDate.toLocaleString(DateTime.TIME_24_SIMPLE),
+          title: `${post.title} ${post.comments ? `[${post.comments}]` : ""}`,
+        };
+      });
     },
 
     setTotalPages(state, totalPages) {
       state.totalPages = totalPages;
     },
+  },
+
+  modules: {
+    post,
   },
 };

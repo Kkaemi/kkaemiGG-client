@@ -10,9 +10,36 @@ export default {
 
   getters: {
     token: (state) => state.token,
+    getAccessTokenExp: (state) => {
+      const accessToken = state.token;
+
+      if (!accessToken) {
+        return 0;
+      }
+
+      const base64 = accessToken
+        .split(".")[1]
+        .replace(/-/g, "+")
+        .replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        Buffer.from(base64, "base64").toString("utf-8")
+      );
+      return JSON.parse(jsonPayload).exp;
+    },
   },
 
   actions: {
+    async checkAuth({ commit, getters }) {
+      const accessTokenExp = getters.getAccessTokenExp;
+
+      if (accessTokenExp > Date.now() / 1000) {
+        return;
+      }
+
+      const { data } = await kkaemiGGApi.get("/v1/token");
+      data.length === 0 ? commit("setToken", null) : commit("setToken", data);
+    },
+
     async logout({ commit }) {
       const { status } = await kkaemiGGApi.delete("/v1/token");
 
