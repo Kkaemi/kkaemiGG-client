@@ -9,19 +9,11 @@
                 {{ title }}
               </div>
 
-              <div v-if="userId == currentUserId">
-                <v-btn
-                  color="success"
-                  class="mr-2"
-                  elevation="0"
-                  @click.stop="modifyPost"
-                >
-                  수정
-                </v-btn>
-                <v-btn color="error" elevation="0" @click.stop="removePost">
-                  삭제
-                </v-btn>
-              </div>
+              <ModifyRemoveButton
+                v-if="userId === currentUserId"
+                :modifyFunction="modifyPost"
+                :removeFunction="removePost"
+              />
             </v-col>
 
             <v-col
@@ -46,43 +38,7 @@
           <div class="pa-6" v-html="content"></div>
         </v-card>
 
-        <v-card class="mt-10" rounded="0">
-          <v-card-title>
-            댓글
-            <span class="ml-3 text--secondary text-body-2"
-              >총 <span class="green--text">0</span> 개</span
-            >
-          </v-card-title>
-
-          <v-divider></v-divider>
-
-          <div class="pa-4">
-            <div
-              v-if="!currentUserId"
-              class="text--disabled d-flex justify-center flex-column align-center"
-            >
-              <v-icon x-large>mdi-comment-processing</v-icon>
-              <div class="mt-3">등록된 댓글이 없습니다.</div>
-            </div>
-            <div v-else>
-              <div class="d-flex flex-column" rounded="0">
-                <v-textarea
-                  placeholder="댓글을 입력해 주세요."
-                  no-resize
-                  hide-details
-                  outlined
-                  class="rounded-0"
-                >
-                </v-textarea>
-                <div class="text-right mt-1">
-                  <v-btn class="rounded-0" color="success" elevation="0">
-                    등록
-                  </v-btn>
-                </div>
-              </div>
-            </div>
-          </div>
-        </v-card>
+        <Comment />
       </v-col>
     </v-row>
 
@@ -92,15 +48,27 @@
 
 <script>
 import { createNamespacedHelpers } from "vuex";
+import Comment from "./Comment.vue";
+import ModifyRemoveButton from "./ModifyRemoveButton.vue";
 
 const { mapActions, mapState, mapGetters } =
   createNamespacedHelpers("community/post");
+
+const commentMappers = createNamespacedHelpers("community/post/comment");
 
 export default {
   name: "PostView",
 
   async mounted() {
     await this.fetchPost(this.$route.params.postId);
+
+    this.initCommentModuleState();
+    await this.fetchCommentList(this.$route.params.postId);
+  },
+
+  components: {
+    Comment,
+    ModifyRemoveButton,
   },
 
   computed: {
@@ -114,6 +82,8 @@ export default {
 
   methods: {
     ...mapActions(["fetchPost"]),
+    ...commentMappers.mapActions(["fetchCommentList"]),
+    ...commentMappers.mapMutations(["initCommentModuleState"]),
 
     modifyPost() {
       console.log("modify");
@@ -126,6 +96,9 @@ export default {
   async beforeRouteUpdate(to, from, next) {
     const postId = to.params.postId;
     await this.fetchPost(postId);
+
+    this.initCommentModuleState();
+    await this.fetchCommentList(postId);
 
     next();
   },

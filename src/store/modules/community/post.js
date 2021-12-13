@@ -1,6 +1,7 @@
 import { kkaemiGGApi } from "@/api/kkaemigg";
 import router from "@/router";
 import { toLocalDateTime } from "@/utils/date-utils";
+import comment from "./comment";
 
 export default {
   namespaced: true,
@@ -54,16 +55,19 @@ export default {
       commit("loading/setIsLoading", true, { root: true });
       await dispatch("auth/checkAuth", null, { root: true });
 
-      const accessToken = rootGetters["auth/token"];
-      const { data } = await kkaemiGGApi.post("/v1/posts", payload, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
-      commit("loading/setIsLoading", false, { root: true });
-
-      router.push({ name: "postView", params: { postId: data } });
+      try {
+        const accessToken = rootGetters["auth/token"];
+        const { data } = await kkaemiGGApi.post("/v1/posts", payload, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        router.push({ name: "postView", params: { postId: data } });
+      } catch (error) {
+        alert("게시글 저장 실패");
+      } finally {
+        commit("loading/setIsLoading", false, { root: true });
+      }
     },
 
     async fetchPost({ commit }, payload) {
@@ -85,5 +89,9 @@ export default {
       state.content = content;
       state.createdDate = createdDate;
     },
+  },
+
+  modules: {
+    comment,
   },
 };

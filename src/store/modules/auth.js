@@ -33,7 +33,7 @@ export default {
     },
 
     currentUserId: (state, getters) => {
-      return getters.tokenPayloadGetter?.sub;
+      return +getters.tokenPayloadGetter?.sub;
     },
   },
 

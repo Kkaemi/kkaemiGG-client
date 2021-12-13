@@ -9,6 +9,7 @@ export const calcPast = (UTC) => {
     hours: "시간 전",
     minutes: "분 전",
     seconds: "초 전",
+    milliseconds: "밀리초 전",
   };
 
   const start = DateTime.fromISO(UTC);
@@ -22,12 +23,14 @@ export const calcPast = (UTC) => {
       "hours",
       "minutes",
       "seconds",
+      "milliseconds",
     ])
     .toObject();
 
   const keys = Object.keys(diffObj);
 
   for (const key of keys) {
+    if (key === "milliseconds") break;
     if (diffObj[key] !== 0) {
       return `${diffObj[key]}${mapObj[key]}`;
     }
