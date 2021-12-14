@@ -1,16 +1,23 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
+import NotFound from "@/components/NotFound.vue";
 import Home from "@/components/Home.vue";
 import OAuth2RedirectHandler from "@/components/OAuth2RedirectHandler.vue";
 import UserCheck from "@/components/summoner/UserCheck.vue";
 import Community from "@/components/community/Community.vue";
 import PostWrite from "@/components/community/PostWrite.vue";
+import PostModify from "@/components/community/PostModify.vue";
 import PostView from "@/components/community/PostView.vue";
 import store from "@/store";
 
 Vue.use(VueRouter);
 
 const routes = [
+  {
+    path: "*",
+    name: "notFound",
+    component: NotFound,
+  },
   {
     path: "/",
     name: "home",
@@ -36,6 +43,16 @@ const routes = [
     path: "/community/posts/:postId",
     name: "postView",
     component: PostView,
+    beforeEnter: async (to, from, next) => {
+      await store.dispatch("community/post/fetchPost", to.params.postId);
+      next();
+    },
+  },
+  {
+    path: "/community/posts/:postId/modify",
+    name: "postModify",
+    component: PostModify,
+    meta: { requiresLogin: true },
   },
   {
     path: "/oauth2/redirect",

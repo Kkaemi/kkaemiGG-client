@@ -11,8 +11,8 @@
 
               <ModifyRemoveButton
                 v-if="userId === currentUserId"
-                :modifyFunction="modifyPost"
-                :removeFunction="removePost"
+                @click-modify="clickModifyBtn"
+                @click-remove="clickRemoveBtn"
               />
             </v-col>
 
@@ -35,7 +35,7 @@
 
           <v-divider></v-divider>
 
-          <div class="pa-6" v-html="content"></div>
+          <Viewer class="pa-6" :initialValue="content" />
         </v-card>
 
         <Comment />
@@ -47,58 +47,67 @@
 </template>
 
 <script>
+import "@toast-ui/editor/dist/toastui-editor-viewer.css";
+import { Viewer } from "@toast-ui/vue-editor";
 import { createNamespacedHelpers } from "vuex";
 import Comment from "./Comment.vue";
 import ModifyRemoveButton from "./ModifyRemoveButton.vue";
 
-const { mapActions, mapState, mapGetters } =
-  createNamespacedHelpers("community/post");
-
+const postMappers = createNamespacedHelpers("community/post");
 const commentMappers = createNamespacedHelpers("community/post/comment");
 
 export default {
   name: "PostView",
 
   async mounted() {
-    await this.fetchPost(this.$route.params.postId);
-
     this.initCommentModuleState();
-    await this.fetchCommentList(this.$route.params.postId);
+    await this.fetchCommentList();
   },
 
   components: {
     Comment,
     ModifyRemoveButton,
+    Viewer,
   },
 
   computed: {
-    ...mapState(["userId", "userNickname", "viewCount", "title", "content"]),
-    ...mapGetters(["getCreatedDate"]),
-
-    currentUserId() {
-      return this.$store.getters["auth/currentUserId"];
-    },
+    ...postMappers.mapState([
+      "userId",
+      "postId",
+      "userNickname",
+      "viewCount",
+      "title",
+      "content",
+    ]),
+    ...postMappers.mapGetters(["getCreatedDate", "currentUserId"]),
   },
 
   methods: {
-    ...mapActions(["fetchPost"]),
+    ...postMappers.mapActions(["fetchPost", "removePost"]),
     ...commentMappers.mapActions(["fetchCommentList"]),
     ...commentMappers.mapMutations(["initCommentModuleState"]),
 
-    modifyPost() {
-      console.log("modify");
+    clickModifyBtn() {
+      const postId = this.postId;
+      this.$router.push({ name: "postModify", params: { postId } });
     },
-    removePost() {
-      console.log("remove");
+
+    async clickRemoveBtn() {
+      if (
+        !confirm(
+          "게시글을 삭제하면 복구할 수 없습니다.\n정말 삭제하시겠습니까?"
+        )
+      ) {
+        return;
+      }
+
+      await this.removePost();
     },
   },
 
   async beforeRouteUpdate(to, from, next) {
-    const postId = to.params.postId;
-    await this.fetchPost(postId);
-
     this.initCommentModuleState();
-    await this.fetchCommentList(postId);
+    await this.fetchCommentList();
 
     next();
   },
