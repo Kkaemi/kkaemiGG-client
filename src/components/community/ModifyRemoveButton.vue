@@ -6,7 +6,7 @@
       color="success"
       class="rounded-0"
       elevation="0"
-      @click.stop="modifyFunction"
+      @click.stop="$emit('click-modify')"
     >
       수정
     </v-btn>
@@ -16,7 +16,7 @@
       color="error"
       class="rounded-0"
       elevation="0"
-      @click.stop="removeFunction"
+      @click.stop="$emit('click-remove')"
     >
       삭제
     </v-btn>
@@ -28,12 +28,12 @@ export default {
   name: "ModifyRemoveButton",
 
   props: {
-    modifyFunction: {
+    clickModify: {
       type: Function,
       default: () => {},
     },
 
-    removeFunction: {
+    clickRemove: {
       type: Function,
       default: () => {},
     },

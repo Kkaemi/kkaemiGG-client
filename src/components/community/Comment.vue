@@ -59,11 +59,15 @@
             <v-tooltip top color="black">
               <template v-slot:activator="{ attr, on }">
                 <span v-bind="attr" v-on="on" class="text--secondary">
-                  {{ comment.createdAt }}
+                  {{
+                    comment.modifiedAt
+                      ? `${comment.modifiedAt} (수정됨)`
+                      : comment.createdAt
+                  }}
                 </span>
               </template>
               <span>
-                {{ comment.createdDate }}
+                {{ comment.modifiedDate || comment.createdDate }}
               </span>
             </v-tooltip>
           </div>
@@ -82,8 +86,8 @@
             <ModifyRemoveButton
               class="ml-auto"
               v-if="currentUserId === comment.userId"
-              onlyRemove
-              :removeFunction="() => clickRemoveButton(comment.commentId)"
+              @click-modify="clickModifyBtn(comment.commentId)"
+              @click-remove="clickRemoveBtn(comment.commentId)"
             />
           </div>
         </div>
@@ -142,6 +146,31 @@
         >댓글 더 보기</v-btn
       >
     </div>
+
+    <v-dialog v-model="modifyDialog" persistent>
+      <v-card>
+        <v-card-title> 댓글 수정 </v-card-title>
+
+        <v-divider></v-divider>
+
+        <div class="pa-5">
+          <v-textarea
+            class="rounded-0"
+            v-model="commentContent"
+            outlined
+            no-resize
+            hide-details
+          ></v-textarea>
+        </div>
+
+        <v-card-actions class="justify-end">
+          <v-btn text @click.stop="modifyDialog = false">취소</v-btn>
+          <v-btn text @click.stop="submitModifiedContent" color="success"
+            >수정</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
 
@@ -159,6 +188,12 @@ export default {
     ModifyRemoveButton,
   },
 
+  data: () => ({
+    modifyDialog: false,
+    modifyCommmentId: 0,
+    commentContent: "",
+  }),
+
   computed: {
     ...mapState([
       "commentList",
@@ -175,6 +210,7 @@ export default {
     ...mapActions([
       "writeComment",
       "removeComment",
+      "modifyComment",
       "fetchCommentList",
       "toggleIsReplyBoxOpen",
     ]),
@@ -211,12 +247,41 @@ export default {
       });
     },
 
+    // 댓글 수정
+    async submitModifiedContent() {
+      const content = this.commentContent;
+      const commentId = this.modifyCommmentId;
+
+      if (!content) {
+        alert("댓글을 입력해 주세요.");
+        return;
+      }
+
+      if (!confirm("수정 하시겠습니까?")) {
+        return;
+      }
+
+      this.modifyDialog = false;
+      await this.modifyComment({
+        commentId,
+        content,
+      });
+    },
+
     // 댓글 or 대댓글 작성 버튼 (답글 쓰기) 토글
     async toggleReplyBox(commentId) {
       await this.toggleIsReplyBoxOpen(commentId);
     },
 
-    async clickRemoveButton(commentId) {
+    clickModifyBtn(commentId) {
+      this.modifyCommmentId = commentId;
+      this.modifyDialog = true;
+      this.commentContent = this.commentList
+        .find((comment) => comment.commentId === commentId)
+        .content.replace(/<br>/g, "\n");
+    },
+
+    async clickRemoveBtn(commentId) {
       if (!window.confirm("정말 삭제하시겠습니까?")) {
         return;
       }

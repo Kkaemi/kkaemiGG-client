@@ -1,6 +1,10 @@
 import { DateTime } from "luxon";
 
 export const calcPast = (UTC) => {
+  if (!UTC) {
+    return null;
+  }
+
   const mapObj = {
     years: "년 전",
     months: "개월 전",
@@ -30,7 +34,10 @@ export const calcPast = (UTC) => {
   const keys = Object.keys(diffObj);
 
   for (const key of keys) {
-    if (key === "milliseconds") break;
+    if (key === "milliseconds") {
+      break;
+    }
+
     if (diffObj[key] !== 0) {
       return `${diffObj[key]}${mapObj[key]}`;
     }
@@ -40,5 +47,9 @@ export const calcPast = (UTC) => {
 };
 
 export const toLocalDateTime = (UTC) => {
+  if (!UTC) {
+    return null;
+  }
+
   return DateTime.fromISO(UTC).toLocaleString(DateTime.DATETIME_MED);
 };

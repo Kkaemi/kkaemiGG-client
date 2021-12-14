@@ -1,6 +1,10 @@
 import { kkaemiGGApi } from "@/api/kkaemigg";
 import { calcPast, toLocalDateTime } from "@/utils/date-utils";
 
+const replaceCRLFtoBrHtmlTag = (crlf) => {
+  return crlf.replace(/\r/g, "").replace(/\n/g, "<br>");
+};
+
 export default {
   namespaced: true,
 
@@ -17,9 +21,11 @@ export default {
 
   getters: {
     parentCommentContent: (state) =>
-      state.parentCommentContent.replace(/\r/g, "").replace(/\n/g, "<br>"),
+      replaceCRLFtoBrHtmlTag(state.parentCommentContent),
+
     currentUserId: (state, getters, rootState, rootGetters) =>
       rootGetters["auth/currentUserId"],
+
     pageableGetter: (state) => ({ page: state.page, size: state.size }),
   },
 
@@ -49,23 +55,45 @@ export default {
       await dispatch("auth/checkAuth", null, { root: true });
       const accessToken = rootGetters["auth/token"];
 
+      const commentContent = state.commentList.find(
+        (comment) => comment.commentId === parentCommentId
+      ).childCommentContent;
+
       const postId = rootState.community.post.postId;
       const content = parentCommentId
-        ? state.commentList.find(
-            (comment) => comment.commentId === parentCommentId
-          ).childCommentContent
+        ? replaceCRLFtoBrHtmlTag(commentContent)
         : getters.parentCommentContent;
+
+      const requestBody = {
+        parentCommentId,
+        groupId,
+        content,
+        postId,
+      };
 
       commit("initCommentModuleState");
 
-      await kkaemiGGApi.post(
-        "/v1/comments",
-        {
-          parentCommentId,
-          groupId,
-          content,
-          postId,
+      await kkaemiGGApi.post("/v1/comments", requestBody, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
         },
+      });
+
+      await dispatch("fetchCommentList");
+    },
+
+    async modifyComment(
+      { commit, rootGetters, dispatch },
+      { commentId, content }
+    ) {
+      await dispatch("auth/checkAuth", null, { root: true });
+      const accessToken = rootGetters["auth/token"];
+
+      commit("initCommentModuleState");
+
+      await kkaemiGGApi.patch(
+        `/v1/comments/${commentId}`,
+        { content: replaceCRLFtoBrHtmlTag(content) },
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -122,6 +150,13 @@ export default {
       state.parentCommentContent = content;
     },
 
+    setChildCommentContent(state, { commentId, content }) {
+      const comment = state.commentList.find(
+        (comment) => comment.commentId === commentId
+      );
+      comment.childCommentContent = content;
+    },
+
     setPage(state, page) {
       state.page = page;
     },
@@ -136,19 +171,12 @@ export default {
           ...comment,
           createdAt: calcPast(comment.createdDate),
           createdDate: toLocalDateTime(comment.createdDate),
+          modifiedAt: calcPast(comment.modifiedDate),
+          modifiedDate: toLocalDateTime(comment.modifiedDate),
           isReplyBoxOpen: false,
           childCommentContent: "",
         }))
       );
-    },
-
-    setChildCommentContent(state, { commentId, content }) {
-      const comment = state.commentList.find(
-        (comment) => comment.commentId === commentId
-      );
-      comment.childCommentContent = content
-        .replace(/\r/g, "")
-        .replace(/\n/g, "<br>");
     },
 
     setIsMore(state, isMore) {
@@ -171,30 +199,6 @@ export default {
 
         return acc;
       }, []);
-    },
-
-    addComment(state, comment) {
-      comment = {
-        ...comment,
-        createdAt: calcPast(comment.createdDate),
-        createdDate: toLocalDateTime(comment.createdDate),
-        isReplyBoxOpen: false,
-      };
-
-      if (!comment.isChildComment) {
-        state.commentList.unshift(comment);
-      } else {
-        const commentList = state.commentList;
-        for (let i = commentList.length - 1; i >= 0; i--) {
-          if (
-            commentList[i].groupId ||
-            commentList[i].commentId === comment.groupId
-          ) {
-            commentList.splice(i, 0, comment);
-            break;
-          }
-        }
-      }
     },
 
     removeComment(state, commentId) {
