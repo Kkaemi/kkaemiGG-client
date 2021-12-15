@@ -55,18 +55,46 @@
             </v-col>
           </v-row>
         </v-card>
-        <v-data-table
-          :headers="headers"
-          :options.sync="options"
-          :items="postList"
-          :items-per-page="size"
-          :page.sync="getDisplayedPage"
-          :loading="isLoading"
-          @click:row="clickRow"
-          class="row-pointer"
-          disable-pagination
-          hide-default-footer
-        />
+        <v-simple-table>
+          <template v-slot:default>
+            <thead>
+              <tr>
+                <th
+                  class="text-center"
+                  v-for="(header, index) in headers"
+                  :key="index"
+                >
+                  {{ header }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="post in postList"
+                :key="post.postId"
+                style="cursor: pointer"
+                @click.stop="clickRow(post.postId)"
+              >
+                <td class="text-center">{{ post.postId }}</td>
+                <td>{{ post.title }}</td>
+                <td class="text-center">{{ post.userNickname }}</td>
+                <v-tooltip top color="black">
+                  <template v-slot:activator="{ attr, on }">
+                    <td v-bind="attr" v-on="on" class="text-center">
+                      {{ post.fromNow }}
+                    </td>
+                  </template>
+                  <span>
+                    {{ post.createdDate }}
+                  </span>
+                </v-tooltip>
+                <td class="text-center">
+                  {{ post.views }}
+                </td>
+              </tr>
+            </tbody>
+          </template>
+        </v-simple-table>
         <div class="text-center mt-3">
           <v-pagination
             :value="getDisplayedPage"
@@ -77,6 +105,8 @@
         </div>
       </v-col>
     </v-row>
+
+    <v-row style="height: 300px"></v-row>
   </v-container>
 </template>
 
@@ -89,36 +119,19 @@ const { mapState, mapGetters, mapActions, mapMutations } =
 export default {
   name: "Community",
 
-  data: () => ({
-    isLoading: false,
-    options: {},
-    headers: [
-      { text: "번호", value: "postId" },
-      { text: "제목", value: "title" },
-      { text: "글쓴이", value: "userNickname" },
-      { text: "작성일", value: "createdDate" },
-      { text: "조회수", value: "views" },
-    ],
-  }),
+  async mounted() {
+    const { target, keyword, page } = this.$route.query;
 
-  watch: {
-    options: {
-      async handler() {
-        this.isLoading = true;
+    this.setTarget(target || "TITLE");
+    this.setKeyword(keyword || "");
+    this.setPage(page ? page - 1 : 0);
 
-        const { sortBy, sortDesc } = this.options;
-
-        if (sortBy.length === 1 && sortDesc.length === 1) {
-          this.setSort([sortBy[0], sortDesc[0] ? "DESC" : "ASC"]);
-        }
-
-        await this.fetchPostList();
-
-        this.isLoading = false;
-      },
-      deep: true,
-    },
+    await this.fetchPostList();
   },
+
+  data: () => ({
+    headers: ["번호", "제목", "글쓴이", "작성일", "조회수"],
+  }),
 
   computed: {
     ...mapState([
@@ -148,9 +161,8 @@ export default {
         alert("검색어를 입력해 주세요.");
         return;
       }
-      this.setSort([]);
-      this.options.sortBy = [];
-      this.options.sortDesc = [];
+
+      this.setPage(0);
 
       this.$router.push({
         name: "postSearch",
@@ -164,14 +176,14 @@ export default {
     goSelectPage(displayedPage) {
       this.$router.push({
         name: "postSearch",
-        params: {
+        query: {
           ...this.$route.query,
-          page: displayedPage - 1,
+          page: displayedPage,
         },
       });
     },
 
-    clickRow({ postId }) {
+    clickRow(postId) {
       this.$router.push({ name: "postView", params: { postId } });
     },
   },
@@ -181,13 +193,9 @@ export default {
 
     this.setTarget(target || "TITLE");
     this.setKeyword(keyword || "");
-    this.setPage(page || 0);
-
-    this.isLoading = true;
+    this.setPage(page ? page - 1 : 0);
 
     await this.fetchPostList();
-
-    this.isLoading = false;
 
     next();
   },
@@ -201,9 +209,5 @@ export default {
 
 .border {
   border: 1px solid lightgrey;
-}
-
-.row-pointer >>> tbody tr :hover {
-  cursor: pointer;
 }
 </style>

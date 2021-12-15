@@ -55,13 +55,13 @@ export default {
       await dispatch("auth/checkAuth", null, { root: true });
       const accessToken = rootGetters["auth/token"];
 
-      const commentContent = state.commentList.find(
-        (comment) => comment.commentId === parentCommentId
-      ).childCommentContent;
-
       const postId = rootState.community.post.postId;
       const content = parentCommentId
-        ? replaceCRLFtoBrHtmlTag(commentContent)
+        ? replaceCRLFtoBrHtmlTag(
+            state.commentList.find(
+              (comment) => comment.commentId === parentCommentId
+            ).childCommentContent
+          )
         : getters.parentCommentContent;
 
       const requestBody = {

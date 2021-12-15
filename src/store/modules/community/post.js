@@ -64,7 +64,7 @@ export default {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-        router.push({ name: "postView", params: { postId: data } });
+        router.replace({ name: "postView", params: { postId: data } });
       } catch (error) {
         alert("게시글 저장 실패");
       }

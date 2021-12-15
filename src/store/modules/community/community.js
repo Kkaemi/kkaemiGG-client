@@ -1,5 +1,5 @@
 import { kkaemiGGApi } from "@/api/kkaemigg";
-import { calcPast } from "../../../utils/date-utils";
+import { calcPast, toLocalDateTime } from "../../../utils/date-utils";
 import post from "./post";
 
 export default {
@@ -14,7 +14,7 @@ export default {
     keyword: "",
 
     page: 0,
-    size: 20,
+    size: 10,
     sort: [],
 
     postList: [],
@@ -79,8 +79,8 @@ export default {
       state.postList = postList.map((post) => {
         return {
           ...post,
-          createdDate: calcPast(post.createdDate),
-          title: `${post.title} ${post.comments ? `[${post.comments}]` : ""}`,
+          fromNow: calcPast(post.createdDate),
+          createdDate: toLocalDateTime(post.createdDate),
         };
       });
     },
