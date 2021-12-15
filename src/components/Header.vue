@@ -1,14 +1,14 @@
 <template>
   <v-app-bar app color="primary" dark>
     <router-link to="/" style="text-decoration: none; color: inherit">
-      <div class="d-flex align-center">
+      <v-toolbar-title class="d-flex align-center">
         <div>
-          <v-icon size="50"> mdi-trophy-variant </v-icon>
+          <v-icon size="30"> mdi-trophy-variant </v-icon>
         </div>
         <div>
-          <span class="ml-4 text-h3 font-weight-medium"> KKAEMI.GG </span>
+          <span class="ml-4 text-h4 font-weight-medium"> KKAEMI.GG </span>
         </div>
-      </div>
+      </v-toolbar-title>
     </router-link>
 
     <v-btn elevation="0" class="ml-5" plain :to="{ name: 'postSearch' }">
@@ -61,12 +61,19 @@ export default {
 
   data: () => ({
     dialog: false,
+    drawer: false,
     socials: [
       {
         type: "google",
         buttonColor: "primary",
         icon: "mdi-google",
         comment: "구글로 로그인",
+      },
+      {
+        type: "naver",
+        buttonColor: "success",
+        icon: "mdi-alpha-n-box",
+        comment: "네이버로 로그인",
       },
     ],
   }),

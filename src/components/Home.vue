@@ -6,7 +6,7 @@
           class="my-5"
           :src="require('@/assets/logo.svg')"
           contain
-          height="75"
+          max-height="75"
         />
       </v-col>
     </v-row>
